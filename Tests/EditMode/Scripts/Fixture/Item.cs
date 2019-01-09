@@ -1,6 +1,5 @@
 namespace Monry.XsvUtility.Fixture
 {
-    [XsvSerializable(SerializeMode.Indexed)]
     public struct ItemIndexed
     {
         [XsvColumn(0)]
@@ -9,7 +8,6 @@ namespace Monry.XsvUtility.Fixture
         public int Size { get; set; }
     }
 
-    [XsvSerializable(SerializeMode.Named)]
     public struct ItemNamed
     {
         [XsvColumn("hash")]

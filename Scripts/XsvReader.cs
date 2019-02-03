@@ -45,21 +45,51 @@ namespace Monry.XsvUtility
             {
                 csvAsset = Resources.Load(csvPathInResources) as TextAsset;
             }
+            if (csvAsset == null) return null;
             var deserialize = CsvSerializer.Deserialize<Data<T>>(csvAsset.text).Rows;
             if (headerEnable) deserialize = deserialize.Skip(1);
             return deserialize;
         }
+        /// <summary>
+        /// Get Directry Of Select KeyType Mode
+        /// </summary>
+        /// <typeparam name="T">Columns(Struct or Class) Type</typeparam>
+        /// <typeparam name="K">Key Type</typeparam>
+        static public Dictionary<K, T> GetDictionary<K, T>(TextAsset csvAsset = null, string csvPathInResources = "", bool headerEnable = false)
+        {
+            var read = ReadCsv<T>(csvAsset, csvPathInResources, headerEnable);
+            if (read == null) return null;
+            return read
+                .GroupBy(val => {
+                    var value = GetKeyColumn(typeof(T)).GetValue(val);
+                    if (typeof(K) == typeof(string))
+                    {
+                        return (K)(object)value.ToString();
+                    } else
+                    {
+                        return (K)value;
+                    }
+                }).ToDictionary(x => x.Key, x => x.Last());
+        }
+        /// <summary>
+        /// Get Directry Of String KeyType Mode
+        /// </summary>
+        /// <typeparam name="T">Columns(Struct or Class) Type</typeparam>
         static public Dictionary<string, T> GetDictionary<T>(TextAsset csvAsset = null, string csvPathInResources = "", bool headerEnable = false)
         {
-            return ReadCsv<T>(csvAsset, csvPathInResources, headerEnable)
-                .GroupBy(val => GetKeyColumn(typeof(T)).GetValue(val).ToString()).ToDictionary(x => x.Key, x => x.Last());
+            return GetDictionary<string, T>(csvAsset, csvPathInResources, headerEnable);
         }
+        /// <typeparam name="T">Columns(Struct or Class) Type</typeparam>
         static public List<T> GetList<T>(TextAsset csvAsset = null, string csvPathInResources = "", bool headerEnable = false)
         {
             return ReadCsv<T>(csvAsset, csvPathInResources, headerEnable).ToList();
         }
         public Dictionary<string, T> ToDictionary<T>() {
-            return GetDictionary<T>(m_CsvAsset, m_CsvPathInResources, m_HeaderEnable);
+            return GetDictionary<string, T>(m_CsvAsset, m_CsvPathInResources, m_HeaderEnable);
+        }
+        public Dictionary<K, T> ToDictionary<K, T>()
+        {
+            return GetDictionary<K, T>(m_CsvAsset, m_CsvPathInResources, m_HeaderEnable);
         }
         public List<T> ToList<T>()
         {

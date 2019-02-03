@@ -145,21 +145,21 @@ namespace Monry.XsvUtility
         /// メンバ変数から辞書型で取り出し
         /// Get Directry of Select KeyType Mode from Member of TextAsset or Resources Filepath
         /// </summary>
-        /// <typeparam name="T">Columns(Struct or Class) Type</typeparam>
-        public Dictionary<string, T> ToDictionary<T>() {
-            if (m_XsvAsset == null) m_XsvAsset = Resources.Load<TextAsset>(m_XsvPathInResources);
-            return GetDictionary<string, T>(m_XsvAsset, m_HeaderEnable, m_Delimiter);
-        }
-        /// <summary>
-        /// 文字列をキーとしてメンバ変数から辞書型で取り出し
-        /// Get Directry of String KeyType Mode from Member of TextAsset or Resources Filepath
-        /// </summary>
         /// <typeparam name="K">Key Type</typeparam>
         /// <typeparam name="T">Columns(Struct or Class) Type</typeparam>
         public Dictionary<K, T> ToDictionary<K, T>()
         {
             if (m_XsvAsset == null) m_XsvAsset = Resources.Load<TextAsset>(m_XsvPathInResources);
             return GetDictionary<K, T>(m_XsvAsset, m_HeaderEnable, m_Delimiter);
+        }
+        /// <summary>
+        /// 文字列をキーとしてメンバ変数から辞書型で取り出し
+        /// Get Directry of String KeyType Mode from Member of TextAsset or Resources Filepath
+        /// </summary>
+        /// <typeparam name="T">Columns(Struct or Class) Type</typeparam>
+        public Dictionary<string, T> ToDictionary<T>() {
+            if (m_XsvAsset == null) m_XsvAsset = Resources.Load<TextAsset>(m_XsvPathInResources);
+            return GetDictionary<string, T>(m_XsvAsset, m_HeaderEnable, m_Delimiter);
         }
         /// <summary>
         /// メンバ変数からリスト型で取り出し

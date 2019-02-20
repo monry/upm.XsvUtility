@@ -12,9 +12,9 @@ namespace Monry.XsvUtility
         [SerializeField, Tooltip("Choose delimiter, CSV->Comma, TSV->Tab")]
         private XsvParser.Delimiter delimiter = XsvParser.Delimiter.Comma;
         [SerializeField, Tooltip("CSV or TSV Asset, Most Prioritable")]
-        private TextAsset xsvAsset = default;
+        private TextAsset xsvAsset;
         [SerializeField, Tooltip("CSV or TSV File Path, then XsvAsset is null")]
-        private string xsvPathInResources = default;
+        private string xsvPathInResources;
         [SerializeField, Tooltip("Header Row Skip Flag")]
         private bool headerEnable = true;
 

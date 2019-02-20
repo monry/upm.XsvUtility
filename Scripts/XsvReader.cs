@@ -60,7 +60,7 @@ namespace Monry.XsvUtility
                 keyList = fields
                     .Where(x => x.GetCustomAttribute<XsvColumnAttribute>() != null).ToList();
             }
-            return ((keyList.Count > 0) ? keyList[0] : null);
+            return keyList.Count > 0 ? keyList[0] : null;
         }
         /// <summary>
         /// XsvDeserializeを使ってTValueの型でパース開始
@@ -108,20 +108,18 @@ namespace Monry.XsvUtility
                     if (typeof(TKey) == typeof(string))
                     {
                         return (TKey)(object)value.ToString();
-                    } else
-                    {
-                        return (TKey)value;
                     }
+
+                    return (TKey)value;
                 }).ToDictionary(x => x.Key, x => x.Last());
         }
+
         /// <summary>
         /// TValueの型でファイルパスから行を辞書型にして取り出し
         /// Get Rows of Dictionary, Columns of TValue, style and Select KeyType Mode from ResourcesPath
         /// </summary>
         /// <typeparam name="TKey">Key Type</typeparam>
         /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        /// <param name="xsvPathInResources">Resources file path</param>
-        /// <returns></returns>
         public static Dictionary<TKey, TValue> GetDictionary<TKey, TValue>(
             XsvParser.Delimiter delimiter,
             string xsvPathInResources,
@@ -136,7 +134,7 @@ namespace Monry.XsvUtility
         /// </summary>
         /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
         public static Dictionary<string, TValue> GetDictionary<TValue>(
-            XsvParser.Delimiter delimiter, 
+            XsvParser.Delimiter delimiter,
             TextAsset xsvAsset,
             bool headerEnable = true)
         {
@@ -148,7 +146,7 @@ namespace Monry.XsvUtility
         /// </summary>
         /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
         public static Dictionary<string, TValue> GetDictionary<TValue>(
-            XsvParser.Delimiter delimiter, 
+            XsvParser.Delimiter delimiter,
             string xsvPathInResources,
             bool headerEnable = true)
         {
@@ -161,7 +159,7 @@ namespace Monry.XsvUtility
         /// </summary>
         /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
         public static List<TValue> GetList<TValue>(
-            XsvParser.Delimiter delimiter, 
+            XsvParser.Delimiter delimiter,
             TextAsset xsvAsset,
             bool headerEnable = true)
         {
@@ -173,17 +171,17 @@ namespace Monry.XsvUtility
         /// </summary>
         /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
         public static List<TValue> GetList<TValue>(
-            XsvParser.Delimiter delimiter, 
+            XsvParser.Delimiter delimiter,
             string xsvPathInResources,
             bool headerEnable = true)
         {
             return ReadXsv<TValue>(delimiter, Resources.Load(xsvPathInResources) as TextAsset, headerEnable).ToList();
         }
+
         /// <summary>
         /// 列をリスト型、行もリスト型にして、アセットから取り出し
         /// Get Rows of List, Columns of List, style from TextAsset
         /// </summary>
-        /// <param name="headerEnable">default: Skip First rows</param>
         public static List<List<string>> GetList(
             XsvParser.Delimiter delimiter,
             TextAsset xsvAsset,
@@ -198,7 +196,6 @@ namespace Monry.XsvUtility
         /// 列をリスト型、行もリスト型にして、ファイルパスから取り出し
         /// Get Rows of List, Columns of List, style from TextAsset
         /// </summary>
-        /// <param name="headerEnable">default: Skip First rows</param>
         public static List<List<string>> GetList(
             XsvParser.Delimiter delimiter,
             string xsvPathInResources,
@@ -215,7 +212,7 @@ namespace Monry.XsvUtility
             TextAsset xsvAsset)
         {
             return XsvParser.ParseWithHeader(delimiter, xsvAsset.text)
-                .Select(x => x.ToDictionary(a => a.Key, a => a.Value)).ToList(); ;
+                .Select(x => x.ToDictionary(a => a.Key, a => a.Value)).ToList();
         }
         /// <summary>
         /// 列を辞書型、行をリスト型にして、ファイルパスから取り出し
@@ -238,8 +235,7 @@ namespace Monry.XsvUtility
         {
             if (XsvAsset == null)
                 return GetDictionary<TKey, TValue>(Delimiter, XsvPathInResources, HeaderEnable);
-            else
-                return GetDictionary<TKey, TValue>(Delimiter, XsvAsset, HeaderEnable);
+            return GetDictionary<TKey, TValue>(Delimiter, XsvAsset, HeaderEnable);
         }
         /// <summary>
         /// TValueの型で文字列をキーとしてメンバ変数から行を辞書型にして取り出し
@@ -261,8 +257,7 @@ namespace Monry.XsvUtility
         {
             if (XsvAsset == null)
                 return GetList<TValue>(Delimiter, XsvPathInResources, HeaderEnable);
-            else
-                return GetList<TValue>(Delimiter, XsvAsset, HeaderEnable);
+            return GetList<TValue>(Delimiter, XsvAsset, HeaderEnable);
         }
         /// <summary>
         /// メンバ変数から行をリスト型にして取り出し
@@ -272,8 +267,7 @@ namespace Monry.XsvUtility
         {
             if (XsvAsset == null)
                 return GetList(Delimiter, XsvPathInResources, HeaderEnable);
-            else
-                return GetList(Delimiter, XsvAsset, HeaderEnable);
+            return GetList(Delimiter, XsvAsset, HeaderEnable);
         }
     }
 }

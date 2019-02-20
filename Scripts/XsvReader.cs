@@ -62,19 +62,29 @@ namespace Monry.XsvUtility
         /// カラムを解析して主キーを特定する、XsvKeyプロパティ指定で主キーとなる
         /// Setting of Primary key from XsvKey Attribute Property
         /// </summary>
-        public static FieldInfo GetKeyColumn(Type type)
+        [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
+        private static object GetKeyColumn<T>(T instance)
         {
-            var fields = type
-                .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            var keyList = fields
-                .Where(x => x.GetCustomAttribute<XsvKeyAttribute>() != null).ToList();
-            if (keyList.Count == 0)
+            var type = typeof(T);
+            var keyFieldList = type
+                .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(x => x.GetCustomAttribute<XsvKeyAttribute>() != null)
+                .ToList();
+            if (keyFieldList.Any())
             {
-                keyList = fields
-                    .Where(x => x.GetCustomAttribute<XsvColumnAttribute>() != null).ToList();
+                return keyFieldList.First().GetValue(instance);
             }
 
-            return keyList.Count > 0 ? keyList[0] : null;
+            var keyPropertyList = type
+                .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(x => x.GetCustomAttribute<XsvKeyAttribute>() != null)
+                .ToList();
+            if (keyPropertyList.Any())
+            {
+                return keyPropertyList.First().GetValue(instance);
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -116,7 +126,7 @@ namespace Monry.XsvUtility
                 .GroupBy(
                     val =>
                     {
-                        var value = GetKeyColumn(typeof(TValue)).GetValue(val);
+                        var value = GetKeyColumn(val);
                         if (typeof(TKey) == typeof(string))
                         {
                             return (TKey) (object) value.ToString();

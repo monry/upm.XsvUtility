@@ -54,18 +54,12 @@ namespace Monry.XsvUtility
 
     internal static class InternalSerializer
     {
-        private static Type EnumParseCurrentType;
-        private static Dictionary<Type, Dictionary<string, int>> EnumParseDelegateMap
-            = new Dictionary<Type, Dictionary<string, int>>();
         private static IDictionary<Type, Func<string, object>> ValueParseDelegateMap { get; } = new Dictionary<Type, Func<string, object>>
         {
             {typeof(bool), value => bool.TryParse(value, out var result) && result},
             {typeof(int), value => int.TryParse(value, out var result) ? result : default},
             {typeof(float), value => float.TryParse(value, out var result) ? result : default},
             {typeof(string), value => value},
-            {typeof(Enum), value => (EnumParseDelegateMap[EnumParseCurrentType].ContainsKey(value))
-                ? Enum.ToObject(EnumParseCurrentType, EnumParseDelegateMap[EnumParseCurrentType][value])
-                : Enum.ToObject(EnumParseCurrentType, (int.TryParse(value, out var result) ? result : default))},
         };
 
         internal static T Deserialize<T>(XsvParser.Delimiter delimiter, string text)
@@ -85,7 +79,6 @@ namespace Monry.XsvUtility
                 property.SetValue(instance, GenerateListInstance(property.PropertyType.GenericTypeArguments[0], rows));
             }
 
-            EnumParseDelegateMap.Clear();
             // Unboxing
             return (T) instance;
         }
@@ -107,7 +100,6 @@ namespace Monry.XsvUtility
                 property.SetValue(instance, GenerateListInstance(property.PropertyType.GenericTypeArguments[0], rows));
             }
 
-            EnumParseDelegateMap.Clear();
             // Unboxing
             return (T) instance;
         }
@@ -127,7 +119,6 @@ namespace Monry.XsvUtility
                 result.AddRange(list.Cast<object>().Select(item => GenerateRow(property.PropertyType.GenericTypeArguments[0], item)));
             }
 
-            EnumParseDelegateMap.Clear();
             return XsvParser.Compose(delimiter, result);
         }
 
@@ -147,7 +138,6 @@ namespace Monry.XsvUtility
                 result.AddRange(list.Cast<object>().Select(item => GenerateRow(property.PropertyType.GenericTypeArguments[0], item, header)));
             }
 
-            EnumParseDelegateMap.Clear();
             return XsvParser.Compose(delimiter, result, header);
         }
 
@@ -305,22 +295,11 @@ namespace Monry.XsvUtility
 
         private static object ParseValue(Type type, string value)
         {
-            // Enumの場合の追加
+            // Use Enum.Parse if type is enum
             if (type.IsEnum)
             {
-                EnumParseCurrentType = type;
-                type = typeof(Enum);
-                if (!EnumParseDelegateMap.ContainsKey(EnumParseCurrentType))
-                {
-                    var parseDict = new Dictionary<string, int>();
-                    foreach (var enumValue in Enum.GetValues(EnumParseCurrentType))
-                    {
-                        string addString = enumValue.ToString();
-                        if (!parseDict.ContainsKey(addString))
-                            parseDict.Add(addString, (int)enumValue); // 列挙体の文字から
-                    }
-                    EnumParseDelegateMap.Add(EnumParseCurrentType, parseDict);
-                }
+                // throw Exception if cannot parse string
+                return Enum.Parse(type, value, true);
             }
             return ValueParseDelegateMap.ContainsKey(type) ? ValueParseDelegateMap[type](value) : default;
         }

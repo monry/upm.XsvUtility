@@ -13,4 +13,16 @@ namespace Monry.XsvUtility.Fixture
         [XsvRow]
         public IEnumerable<ItemNamed> ItemList { get; set; }
     }
+
+    public struct DataSimpleEnum
+    {
+        [XsvRow]
+        public IEnumerable<ItemSimpleEnum> ItemList { get; set; }
+    }
+
+    public struct DataFlagEnum
+    {
+        [XsvRow]
+        public IEnumerable<ItemFlagEnum> ItemList { get; set; }
+    }
 }

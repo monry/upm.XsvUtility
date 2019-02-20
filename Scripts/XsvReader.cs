@@ -10,16 +10,38 @@ namespace Monry.XsvUtility
     public class XsvReader
     {
         [SerializeField, Tooltip("Choose delimiter, CSV->Comma, TSV->Tab")]
-        public XsvParser.Delimiter m_Delimiter = XsvParser.Delimiter.Comma;
-        /// <summary>
-        /// Most Prioritable Is Text Asset
-        /// </summary>
+        private XsvParser.Delimiter delimiter = XsvParser.Delimiter.Comma;
         [SerializeField, Tooltip("CSV or TSV Asset, Most Prioritable")]
-        public TextAsset m_XsvAsset = default;
+        private TextAsset xsvAsset = default;
         [SerializeField, Tooltip("CSV or TSV File Path, then XsvAsset is null")]
-        public string m_XsvPathInResources = default;
+        private string xsvPathInResources = default;
         [SerializeField, Tooltip("Header Row Skip Flag")]
-        public bool m_HeaderEnable = true;
+        private bool headerEnable = true;
+
+        public XsvParser.Delimiter Delimiter
+        {
+            get => delimiter;
+            set => delimiter = value;
+        }
+
+        public TextAsset XsvAsset
+        {
+            get => xsvAsset;
+            set => xsvAsset = value;
+        }
+
+        public string XsvPathInResources
+        {
+            get => xsvPathInResources;
+            set => xsvPathInResources = value;
+        }
+
+        public bool HeaderEnable
+        {
+            get => headerEnable;
+            set => headerEnable = value;
+        }
+
         public struct Data<TValue>
         {
             [XsvRow] public IEnumerable<TValue> Rows { get; set; }
@@ -214,10 +236,10 @@ namespace Monry.XsvUtility
         /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
         public Dictionary<TKey, TValue> GetDictionary<TKey, TValue>()
         {
-            if (m_XsvAsset == null)
-                return GetDictionary<TKey, TValue>(m_Delimiter, m_XsvPathInResources, m_HeaderEnable);
+            if (XsvAsset == null)
+                return GetDictionary<TKey, TValue>(Delimiter, XsvPathInResources, HeaderEnable);
             else
-                return GetDictionary<TKey, TValue>(m_Delimiter, m_XsvAsset, m_HeaderEnable);
+                return GetDictionary<TKey, TValue>(Delimiter, XsvAsset, HeaderEnable);
         }
         /// <summary>
         /// TValueの型で文字列をキーとしてメンバ変数から行を辞書型にして取り出し
@@ -225,10 +247,10 @@ namespace Monry.XsvUtility
         /// </summary>
         /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
         public Dictionary<string, TValue> GetDictionary<TValue>() {
-            if (m_XsvAsset == null)
-                return GetDictionary<string, TValue>(m_Delimiter, m_XsvPathInResources, m_HeaderEnable);
+            if (XsvAsset == null)
+                return GetDictionary<string, TValue>(Delimiter, XsvPathInResources, HeaderEnable);
             else
-                return GetDictionary<string, TValue>(m_Delimiter, m_XsvAsset, m_HeaderEnable);
+                return GetDictionary<string, TValue>(Delimiter, XsvAsset, HeaderEnable);
         }
         /// <summary>
         /// TValueの型でメンバ変数から行をリスト型にして取り出し
@@ -237,10 +259,10 @@ namespace Monry.XsvUtility
         /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
         public List<TValue> GetList<TValue>()
         {
-            if (m_XsvAsset == null)
-                return GetList<TValue>(m_Delimiter, m_XsvPathInResources, m_HeaderEnable);
+            if (XsvAsset == null)
+                return GetList<TValue>(Delimiter, XsvPathInResources, HeaderEnable);
             else
-                return GetList<TValue>(m_Delimiter, m_XsvAsset, m_HeaderEnable);
+                return GetList<TValue>(Delimiter, XsvAsset, HeaderEnable);
         }
         /// <summary>
         /// メンバ変数から行をリスト型にして取り出し
@@ -248,10 +270,10 @@ namespace Monry.XsvUtility
         /// </summary>
         public List<List<string>> GetList()
         {
-            if (m_XsvAsset == null)
-                return GetList(m_Delimiter, m_XsvPathInResources, m_HeaderEnable);
+            if (XsvAsset == null)
+                return GetList(Delimiter, XsvPathInResources, HeaderEnable);
             else
-                return GetList(m_Delimiter, m_XsvAsset, m_HeaderEnable);
+                return GetList(Delimiter, XsvAsset, HeaderEnable);
         }
     }
 }

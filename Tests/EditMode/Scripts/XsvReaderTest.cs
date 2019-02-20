@@ -63,9 +63,9 @@ namespace Monry.XsvUtility
                 Debug.Log(string.Format("Case7 GetDictionary<int, T> Dictionary/T; " +
                     "Dic[10].id:{0}, Dic[100].id:{1}", dic[10].id, dic[100].id));
             }
-            m_XsvData.m_Delimiter = XsvParser.Delimiter.Comma;
-            m_XsvData.m_XsvAsset = rowsAsset;
-            m_XsvData.m_HeaderEnable = true;
+            m_XsvData.Delimiter = XsvParser.Delimiter.Comma;
+            m_XsvData.XsvAsset = rowsAsset;
+            m_XsvData.HeaderEnable = true;
             Debug.Log("Set XsvReader m_XsvData from Serialize Field, \n" +
                 "Current Example Case; m_Delimiter:Comma, m_XsvAsset = rowsAsset, m_HeaderEnable = true");
             {

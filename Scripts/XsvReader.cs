@@ -127,7 +127,7 @@ namespace Monry.XsvUtility
         /// </summary>
         /// <typeparam name="TKey">Key Type</typeparam>
         /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public static Dictionary<TKey, TValue> GetDictionary<TKey, TValue>(
+        public static IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(
             XsvParser.Delimiter delimiter,
             TextAsset xsvAsset,
             bool headerEnable = true)
@@ -153,7 +153,7 @@ namespace Monry.XsvUtility
         /// Get Rows of Dictionary, Columns of TValue, style and String KeyType Mode
         /// </summary>
         /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public static Dictionary<string, TValue> GetDictionary<TValue>(
+        public static IDictionary<string, TValue> GetDictionary<TValue>(
             XsvParser.Delimiter delimiter,
             TextAsset xsvAsset,
             bool headerEnable = true)
@@ -166,7 +166,7 @@ namespace Monry.XsvUtility
         /// Get Rows of List style from TextAsset of TValue, Columns of TValue
         /// </summary>
         /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public static List<TValue> GetList<TValue>(
+        public static IEnumerable<TValue> GetList<TValue>(
             XsvParser.Delimiter delimiter,
             TextAsset xsvAsset,
             bool headerEnable = true)
@@ -178,7 +178,7 @@ namespace Monry.XsvUtility
         /// 列をリスト型、行もリスト型にして、アセットから取り出し
         /// Get Rows of List, Columns of List, style from TextAsset
         /// </summary>
-        public static List<List<string>> GetList(
+        public static IEnumerable<IEnumerable<string>> GetList(
             XsvParser.Delimiter delimiter,
             TextAsset xsvAsset,
             bool headerEnable = true)
@@ -197,7 +197,7 @@ namespace Monry.XsvUtility
         /// 列を辞書型、行をリスト型にして、アセットから取り出し
         /// Get Rows of List, Columns of Dictionary, style from TextAsset
         /// </summary>
-        public static List<Dictionary<string, string>> GetListWithHeader(
+        public static IEnumerable<Dictionary<string, string>> GetListWithHeader(
             XsvParser.Delimiter delimiter,
             TextAsset xsvAsset)
         {
@@ -211,7 +211,7 @@ namespace Monry.XsvUtility
         /// </summary>
         /// <typeparam name="TKey">Key Type</typeparam>
         /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public Dictionary<TKey, TValue> GetDictionary<TKey, TValue>()
+        public IDictionary<TKey, TValue> GetDictionary<TKey, TValue>()
         {
             return GetDictionary<TKey, TValue>(Delimiter, XsvAsset, HeaderEnable);
         }
@@ -221,7 +221,7 @@ namespace Monry.XsvUtility
         /// Get Rows of Dictionary, Columns of TValue, style and String KeyType Mode from Member of TextAsset or Resources Filepath
         /// </summary>
         /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public Dictionary<string, TValue> GetDictionary<TValue>()
+        public IDictionary<string, TValue> GetDictionary<TValue>()
         {
             return GetDictionary<string, TValue>(Delimiter, XsvAsset, HeaderEnable);
         }
@@ -231,7 +231,7 @@ namespace Monry.XsvUtility
         /// Get Rows of List, Columns of TValue, style from Member of TextAsset or Resources Filepath
         /// </summary>
         /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public List<TValue> GetList<TValue>()
+        public IEnumerable<TValue> GetList<TValue>()
         {
             return GetList<TValue>(Delimiter, XsvAsset, HeaderEnable);
         }
@@ -240,7 +240,7 @@ namespace Monry.XsvUtility
         /// メンバ変数から行をリスト型にして取り出し
         /// Get Rows of List, Columns of List, style from Member of TextAsset or Resources Filepath
         /// </summary>
-        public List<List<string>> GetList()
+        public IEnumerable<IEnumerable<string>> GetList()
         {
             return GetList(Delimiter, XsvAsset, HeaderEnable);
         }

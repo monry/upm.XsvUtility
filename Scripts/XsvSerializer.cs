@@ -55,7 +55,7 @@ namespace Monry.XsvUtility
     internal static class InternalSerializer
     {
         private static Type EnumParseCurrentType;
-        private static Dictionary<Type, Dictionary<string, int>> EnumParseDelegateMap 
+        private static Dictionary<Type, Dictionary<string, int>> EnumParseDelegateMap
             = new Dictionary<Type, Dictionary<string, int>>();
         private static IDictionary<Type, Func<string, object>> ValueParseDelegateMap { get; } = new Dictionary<Type, Func<string, object>>
         {
@@ -63,7 +63,7 @@ namespace Monry.XsvUtility
             {typeof(int), value => int.TryParse(value, out var result) ? result : default},
             {typeof(float), value => float.TryParse(value, out var result) ? result : default},
             {typeof(string), value => value},
-            {typeof(Enum), value => (EnumParseDelegateMap[EnumParseCurrentType].ContainsKey(value)) 
+            {typeof(Enum), value => (EnumParseDelegateMap[EnumParseCurrentType].ContainsKey(value))
                 ? Enum.ToObject(EnumParseCurrentType, EnumParseDelegateMap[EnumParseCurrentType][value])
                 : Enum.ToObject(EnumParseCurrentType, (int.TryParse(value, out var result) ? result : default))},
         };
@@ -305,7 +305,7 @@ namespace Monry.XsvUtility
 
         private static object ParseValue(Type type, string value)
         {
-            // Enum‚Ìê‡‚Ì’Ç‰Á
+            // Enumã®å ´åˆã®è¿½åŠ 
             if (type.IsEnum)
             {
                 EnumParseCurrentType = type;
@@ -317,7 +317,7 @@ namespace Monry.XsvUtility
                     {
                         string addString = enumValue.ToString();
                         if (!parseDict.ContainsKey(addString))
-                            parseDict.Add(addString, (int)enumValue);         // —ñ‹“‘Ì‚Ì•¶š‚©‚ç
+                            parseDict.Add(addString, (int)enumValue); // åˆ—æŒ™ä½“ã®æ–‡å­—ã‹ã‚‰
                     }
                     EnumParseDelegateMap.Add(EnumParseCurrentType, parseDict);
                 }

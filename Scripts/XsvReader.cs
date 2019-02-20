@@ -69,56 +69,43 @@ namespace Monry.XsvUtility
         }
 
         /// <summary>
-        /// カラムを解析して主キーを特定する、XsvKeyプロパティ指定で主キーとなる
-        /// Setting of Primary key from XsvKey Attribute Property
+        /// TValueの型でメンバ変数から行を辞書型にして取り出し
+        /// Get Directry, Columns of TValue, of Select KeyType Mode from Member of TextAsset or Resources Filepath
         /// </summary>
-        [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
-        private static object GetKeyColumn<T>(T instance)
+        /// <typeparam name="TKey">Key Type</typeparam>
+        /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
+        public IDictionary<TKey, TValue> GetDictionary<TKey, TValue>()
         {
-            var type = typeof(T);
-            var keyFieldList = type
-                .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                .Where(x => x.GetCustomAttribute<XsvKeyAttribute>() != null)
-                .ToList();
-            if (keyFieldList.Any())
-            {
-                return keyFieldList.First().GetValue(instance);
-            }
-
-            var keyPropertyList = type
-                .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                .Where(x => x.GetCustomAttribute<XsvKeyAttribute>() != null)
-                .ToList();
-            if (keyPropertyList.Any())
-            {
-                return keyPropertyList.First().GetValue(instance);
-            }
-
-            return null;
+            return GetDictionary<TKey, TValue>(Delimiter, XsvAsset, HeaderEnable);
         }
 
         /// <summary>
-        /// XsvDeserializeを使ってTValueの型でパース開始
-        /// Run XsvDeserialize with options
+        /// TValueの型で文字列をキーとしてメンバ変数から行を辞書型にして取り出し
+        /// Get Rows of Dictionary, Columns of TValue, style and String KeyType Mode from Member of TextAsset or Resources Filepath
         /// </summary>
         /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        private static IEnumerable<TValue> ReadXsv<TValue>(
-            XsvParser.Delimiter delimiter,
-            TextAsset xsvAsset,
-            bool headerEnable = true)
+        public IDictionary<string, TValue> GetDictionary<TValue>()
         {
-            if (xsvAsset == null)
-            {
-                return null;
-            }
+            return GetDictionary<string, TValue>(Delimiter, XsvAsset, HeaderEnable);
+        }
 
-            return
-                (
-                    headerEnable
-                        ? InternalSerializer.DeserializeWithHeader<Data<TValue>>(delimiter, xsvAsset.text)
-                        : InternalSerializer.Deserialize<Data<TValue>>(delimiter, xsvAsset.text)
-                )
-                .Rows;
+        /// <summary>
+        /// TValueの型でメンバ変数から行をリスト型にして取り出し
+        /// Get Rows of List, Columns of TValue, style from Member of TextAsset or Resources Filepath
+        /// </summary>
+        /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
+        public IEnumerable<TValue> GetList<TValue>()
+        {
+            return GetList<TValue>(Delimiter, XsvAsset, HeaderEnable);
+        }
+
+        /// <summary>
+        /// メンバ変数から行をリスト型にして取り出し
+        /// Get Rows of List, Columns of List, style from Member of TextAsset or Resources Filepath
+        /// </summary>
+        public IEnumerable<IEnumerable<string>> GetList()
+        {
+            return GetList(Delimiter, XsvAsset, HeaderEnable);
         }
 
         /// <summary>
@@ -206,43 +193,56 @@ namespace Monry.XsvUtility
         }
 
         /// <summary>
-        /// TValueの型でメンバ変数から行を辞書型にして取り出し
-        /// Get Directry, Columns of TValue, of Select KeyType Mode from Member of TextAsset or Resources Filepath
+        /// カラムを解析して主キーを特定する、XsvKeyプロパティ指定で主キーとなる
+        /// Setting of Primary key from XsvKey Attribute Property
         /// </summary>
-        /// <typeparam name="TKey">Key Type</typeparam>
-        /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public IDictionary<TKey, TValue> GetDictionary<TKey, TValue>()
+        [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
+        private static object GetKeyColumn<T>(T instance)
         {
-            return GetDictionary<TKey, TValue>(Delimiter, XsvAsset, HeaderEnable);
+            var type = typeof(T);
+            var keyFieldList = type
+                .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(x => x.GetCustomAttribute<XsvKeyAttribute>() != null)
+                .ToList();
+            if (keyFieldList.Any())
+            {
+                return keyFieldList.First().GetValue(instance);
+            }
+
+            var keyPropertyList = type
+                .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(x => x.GetCustomAttribute<XsvKeyAttribute>() != null)
+                .ToList();
+            if (keyPropertyList.Any())
+            {
+                return keyPropertyList.First().GetValue(instance);
+            }
+
+            return null;
         }
 
         /// <summary>
-        /// TValueの型で文字列をキーとしてメンバ変数から行を辞書型にして取り出し
-        /// Get Rows of Dictionary, Columns of TValue, style and String KeyType Mode from Member of TextAsset or Resources Filepath
+        /// XsvDeserializeを使ってTValueの型でパース開始
+        /// Run XsvDeserialize with options
         /// </summary>
         /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public IDictionary<string, TValue> GetDictionary<TValue>()
+        private static IEnumerable<TValue> ReadXsv<TValue>(
+            XsvParser.Delimiter delimiter,
+            TextAsset xsvAsset,
+            bool headerEnable = true)
         {
-            return GetDictionary<string, TValue>(Delimiter, XsvAsset, HeaderEnable);
-        }
+            if (xsvAsset == null)
+            {
+                return null;
+            }
 
-        /// <summary>
-        /// TValueの型でメンバ変数から行をリスト型にして取り出し
-        /// Get Rows of List, Columns of TValue, style from Member of TextAsset or Resources Filepath
-        /// </summary>
-        /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public IEnumerable<TValue> GetList<TValue>()
-        {
-            return GetList<TValue>(Delimiter, XsvAsset, HeaderEnable);
-        }
-
-        /// <summary>
-        /// メンバ変数から行をリスト型にして取り出し
-        /// Get Rows of List, Columns of List, style from Member of TextAsset or Resources Filepath
-        /// </summary>
-        public IEnumerable<IEnumerable<string>> GetList()
-        {
-            return GetList(Delimiter, XsvAsset, HeaderEnable);
+            return
+                (
+                    headerEnable
+                        ? InternalSerializer.DeserializeWithHeader<Data<TValue>>(delimiter, xsvAsset.text)
+                        : InternalSerializer.Deserialize<Data<TValue>>(delimiter, xsvAsset.text)
+                )
+                .Rows;
         }
     }
 }

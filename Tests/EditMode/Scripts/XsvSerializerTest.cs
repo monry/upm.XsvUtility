@@ -19,7 +19,7 @@ namespace Monry.XsvUtility
         private const string FixtureTextFlagEnumTsv = "Foo,baz\t30\nbar, Quz\t40\n";
         private const string FixtureTextSimpleEnumTsvThrowable = "Foo\t10\nHoge\t20\n";
 
-        private static DataIndexed FixtureInstanceIndexed = new DataIndexed
+        private static DataIndexed FixtureInstanceIndexed { get; } = new DataIndexed
         {
             ItemList = new List<ItemIndexed>
             {
@@ -30,7 +30,7 @@ namespace Monry.XsvUtility
             },
         };
 
-        private static DataNamed FixtureInstanceNamed = new DataNamed
+        private static DataNamed FixtureInstanceNamed { get; } = new DataNamed
         {
             ItemList = new List<ItemNamed>
             {
@@ -41,7 +41,7 @@ namespace Monry.XsvUtility
             },
         };
 
-        private static DataSimpleEnum FixtureInstanceSimpleEnum = new DataSimpleEnum
+        private static DataSimpleEnum FixtureInstanceSimpleEnum { get; } = new DataSimpleEnum
         {
             ItemList = new List<ItemSimpleEnum>
             {
@@ -50,7 +50,7 @@ namespace Monry.XsvUtility
             }
         };
 
-        private static DataFlagEnum FixtureInstanceFlagEnum = new DataFlagEnum
+        private static DataFlagEnum FixtureInstanceFlagEnum { get; } = new DataFlagEnum
         {
             ItemList = new List<ItemFlagEnum>
             {

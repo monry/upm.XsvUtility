@@ -92,27 +92,13 @@ namespace Monry.XsvUtility
                 return null;
             }
 
-            switch (delimiter)
-            {
-                case XsvParser.Delimiter.Comma:
-                    return
-                        (
-                            headerEnable
-                                ? CsvSerializer.DeserializeWithHeader<Data<TValue>>(xsvAsset.text)
-                                : CsvSerializer.Deserialize<Data<TValue>>(xsvAsset.text)
-                        )
-                        .Rows;
-                case XsvParser.Delimiter.Tab:
-                    return
-                        (
-                            headerEnable
-                                ? TsvSerializer.DeserializeWithHeader<Data<TValue>>(xsvAsset.text)
-                                : TsvSerializer.Deserialize<Data<TValue>>(xsvAsset.text)
-                        )
-                        .Rows;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(delimiter), delimiter, null);
-            }
+            return
+                (
+                    headerEnable
+                        ? InternalSerializer.DeserializeWithHeader<Data<TValue>>(delimiter, xsvAsset.text)
+                        : InternalSerializer.Deserialize<Data<TValue>>(delimiter, xsvAsset.text)
+                )
+                .Rows;
         }
 
         /// <summary>

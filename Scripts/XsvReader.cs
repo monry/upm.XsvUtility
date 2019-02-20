@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Monry.XsvUtility
@@ -147,20 +149,6 @@ namespace Monry.XsvUtility
         }
 
         /// <summary>
-        /// TValueの型でファイルパスから行を辞書型にして取り出し
-        /// Get Rows of Dictionary, Columns of TValue, style and Select KeyType Mode from ResourcesPath
-        /// </summary>
-        /// <typeparam name="TKey">Key Type</typeparam>
-        /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public static Dictionary<TKey, TValue> GetDictionary<TKey, TValue>(
-            XsvParser.Delimiter delimiter,
-            string xsvPathInResources,
-            bool headerEnable = true)
-        {
-            return GetDictionary<TKey, TValue>(delimiter, Resources.Load<TextAsset>(xsvPathInResources), headerEnable);
-        }
-
-        /// <summary>
         /// TValueの型で文字列をキーとして行を辞書型にして取り出し
         /// Get Rows of Dictionary, Columns of TValue, style and String KeyType Mode
         /// </summary>
@@ -174,19 +162,6 @@ namespace Monry.XsvUtility
         }
 
         /// <summary>
-        /// TValueの型で文字列をキーとしてファイルパスから行を辞書型にして取り出し
-        /// Get Rows of Dictionary, Columns of TValue, style and String KeyType Mode from ResourcesPath
-        /// </summary>
-        /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public static Dictionary<string, TValue> GetDictionary<TValue>(
-            XsvParser.Delimiter delimiter,
-            string xsvPathInResources,
-            bool headerEnable = true)
-        {
-            return GetDictionary<string, TValue>(delimiter, Resources.Load(xsvPathInResources) as TextAsset, headerEnable);
-        }
-
-        /// <summary>
         /// TValueの型で行をリスト型にして取り出し
         /// Get Rows of List style from TextAsset of TValue, Columns of TValue
         /// </summary>
@@ -197,19 +172,6 @@ namespace Monry.XsvUtility
             bool headerEnable = true)
         {
             return ReadXsv<TValue>(delimiter, xsvAsset, headerEnable).ToList();
-        }
-
-        /// <summary>
-        /// TValueの型でファイルパスから行をリスト型にして取り出し
-        /// Get Rows of List style from ResourcesPath, Columns of TValue
-        /// </summary>
-        /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public static List<TValue> GetList<TValue>(
-            XsvParser.Delimiter delimiter,
-            string xsvPathInResources,
-            bool headerEnable = true)
-        {
-            return ReadXsv<TValue>(delimiter, Resources.Load(xsvPathInResources) as TextAsset, headerEnable).ToList();
         }
 
         /// <summary>
@@ -232,18 +194,6 @@ namespace Monry.XsvUtility
         }
 
         /// <summary>
-        /// 列をリスト型、行もリスト型にして、ファイルパスから取り出し
-        /// Get Rows of List, Columns of List, style from TextAsset
-        /// </summary>
-        public static List<List<string>> GetList(
-            XsvParser.Delimiter delimiter,
-            string xsvPathInResources,
-            bool headerEnable = true)
-        {
-            return GetList(delimiter, Resources.Load(xsvPathInResources) as TextAsset, headerEnable);
-        }
-
-        /// <summary>
         /// 列を辞書型、行をリスト型にして、アセットから取り出し
         /// Get Rows of List, Columns of Dictionary, style from TextAsset
         /// </summary>
@@ -253,17 +203,6 @@ namespace Monry.XsvUtility
         {
             return XsvParser.ParseWithHeader(delimiter, xsvAsset.text)
                 .Select(x => x.ToDictionary(a => a.Key, a => a.Value)).ToList();
-        }
-
-        /// <summary>
-        /// 列を辞書型、行をリスト型にして、ファイルパスから取り出し
-        /// Get Rows of List, Columns of Dictionary, style from TextAsset
-        /// </summary>
-        public static List<Dictionary<string, string>> GetListWithHeader(
-            XsvParser.Delimiter delimiter,
-            string xsvPathInResources)
-        {
-            return GetListWithHeader(delimiter, Resources.Load(xsvPathInResources) as TextAsset);
         }
 
         /// <summary>

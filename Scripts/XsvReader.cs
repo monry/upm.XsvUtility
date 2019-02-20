@@ -55,7 +55,15 @@ namespace Monry.XsvUtility
 
         public struct Data<TValue>
         {
-            [XsvRow] public IEnumerable<TValue> Rows { get; set; }
+            [XsvRow] public IEnumerable<TValue> Rows { get; [UsedImplicitly] set; }
+
+            [SuppressMessage("ReSharper", "UnusedMember.Global")]
+            [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
+            public static void AOTWorkaround()
+            {
+                new Data<TValue>();
+                new List<Data<TValue>>();
+            }
         }
 
         /// <summary>

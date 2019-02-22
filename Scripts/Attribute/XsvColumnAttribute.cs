@@ -18,5 +18,11 @@ namespace Monry.XsvUtility
         {
             Name = name;
         }
+
+        public XsvColumnAttribute(int index, string name)
+        {
+            Index = index;
+            Name = name;
+        }
     }
 }

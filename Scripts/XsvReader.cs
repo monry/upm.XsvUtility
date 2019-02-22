@@ -12,7 +12,7 @@ namespace Monry.XsvUtility
     public class XsvReader
     {
         [SerializeField, Tooltip("Choose delimiter, CSV->Comma, TSV->Tab")]
-        private XsvParser.Delimiter delimiter = XsvParser.Delimiter.Comma;
+        private XsvParser.Delimiter delimiter;
 
         [SerializeField, Tooltip("CSV or TSV Asset, Most Prioritable")]
         private TextAsset xsvAsset;
@@ -21,38 +21,31 @@ namespace Monry.XsvUtility
         private string xsvPathInResources;
 
         [SerializeField, Tooltip("Header Row Skip Flag")]
-        private bool headerEnable = true;
+        private bool withHeader;
 
-        public XsvParser.Delimiter Delimiter
+        private XsvParser.Delimiter Delimiter => delimiter;
+
+        private TextAsset XsvAsset =>
+            xsvAsset == null && !string.IsNullOrEmpty(XsvPathInResources)
+                ? xsvAsset = Resources.Load<TextAsset>(XsvPathInResources)
+                : xsvAsset;
+
+        private string XsvPathInResources => xsvPathInResources;
+
+        private bool WithHeader => withHeader;
+
+        public XsvReader(XsvParser.Delimiter delimiter, TextAsset xsvAsset, bool withHeader)
         {
-            get => delimiter;
-            set => delimiter = value;
+            this.delimiter = delimiter;
+            this.xsvAsset = xsvAsset;
+            this.withHeader = withHeader;
         }
 
-        public TextAsset XsvAsset
+        public XsvReader(XsvParser.Delimiter delimiter, string xsvPathInResources, bool withHeader)
         {
-            get
-            {
-                if (xsvAsset == null && !string.IsNullOrEmpty(XsvPathInResources))
-                {
-                    xsvAsset = Resources.Load<TextAsset>(XsvPathInResources);
-                }
-
-                return xsvAsset;
-            }
-            set => xsvAsset = value;
-        }
-
-        public string XsvPathInResources
-        {
-            get => xsvPathInResources;
-            set => xsvPathInResources = value;
-        }
-
-        public bool HeaderEnable
-        {
-            get => headerEnable;
-            set => headerEnable = value;
+            this.delimiter = delimiter;
+            this.xsvPathInResources = xsvPathInResources;
+            this.withHeader = withHeader;
         }
 
         public struct Data<TValue>
@@ -69,127 +62,212 @@ namespace Monry.XsvUtility
         }
 
         /// <summary>
-        /// TValueの型でメンバ変数から行を辞書型にして取り出し
-        /// Get Directry, Columns of TValue, of Select KeyType Mode from Member of TextAsset or Resources Filepath
+        /// Get rows as a grouped Dictionary whose type is list of TValue
         /// </summary>
-        /// <typeparam name="TKey">Key Type</typeparam>
-        /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public IDictionary<TKey, TValue> GetDictionary<TKey, TValue>()
+        /// <typeparam name="TKey">Type of grouping key defined in TValue</typeparam>
+        /// <typeparam name="TValue">Type of value</typeparam>
+        /// <returns></returns>
+        public IDictionary<TKey, IList<TValue>> GetGroupedValueDictionary<TKey, TValue>()
         {
-            return GetDictionary<TKey, TValue>(Delimiter, XsvAsset, HeaderEnable);
+            return ReadAsGroupedValueDictionary<TKey, TValue>(Delimiter, XsvAsset, WithHeader);
         }
 
         /// <summary>
-        /// TValueの型で文字列をキーとしてメンバ変数から行を辞書型にして取り出し
-        /// Get Rows of Dictionary, Columns of TValue, style and String KeyType Mode from Member of TextAsset or Resources Filepath
+        /// Get rows as a grouped List whose type is list of string Dictionary
         /// </summary>
-        /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public IDictionary<string, TValue> GetDictionary<TValue>()
+        public IList<IList<IDictionary<string, string>>> GetGroupedStringDictionaryList()
         {
-            return GetDictionary<string, TValue>(Delimiter, XsvAsset, HeaderEnable);
+            return ReadAsGroupedStringDictionaryList(Delimiter, XsvAsset, WithHeader);
         }
 
         /// <summary>
-        /// TValueの型でメンバ変数から行をリスト型にして取り出し
-        /// Get Rows of List, Columns of TValue, style from Member of TextAsset or Resources Filepath
+        /// Get rows as a Dictionary whose type is TValue
         /// </summary>
-        /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public IEnumerable<TValue> GetList<TValue>()
+        /// <typeparam name="TKey">Type of grouping key defined in TValue</typeparam>
+        /// <typeparam name="TValue">Type of value</typeparam>
+        public IDictionary<TKey, TValue> GetValueDictionary<TKey, TValue>(bool useFirst = true)
         {
-            return GetList<TValue>(Delimiter, XsvAsset, HeaderEnable);
+            return ReadAsValueDictionary<TKey, TValue>(Delimiter, XsvAsset, WithHeader, useFirst);
         }
 
         /// <summary>
-        /// メンバ変数から行をリスト型にして取り出し
-        /// Get Rows of List, Columns of List, style from Member of TextAsset or Resources Filepath
+        /// Get rows as a Dictionary whose type is string
         /// </summary>
-        public IEnumerable<IEnumerable<string>> GetList()
+        public IList<IDictionary<string, string>> GetStringDictionaryList(bool useFirst = true)
         {
-            return GetList(Delimiter, XsvAsset, HeaderEnable);
+            return ReadAsStringDictionaryList(Delimiter, XsvAsset, WithHeader, useFirst);
         }
 
         /// <summary>
-        /// TValueの型で行を辞書型にして取り出し
-        /// Get Rows of Dictionary, Columns of TValue, style and Select KeyType Mode from TextAsset
+        /// Get rows as a grouped List whose type is list of string
         /// </summary>
-        /// <typeparam name="TKey">Key Type</typeparam>
-        /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public static IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(
-            XsvParser.Delimiter delimiter,
-            TextAsset xsvAsset,
-            bool headerEnable = true)
+        public IList<IList<IList<string>>> GetGroupedStringListList()
         {
-            return ReadXsv<TValue>(delimiter, xsvAsset, headerEnable)?
-                .GroupBy(
-                    val =>
-                    {
-                        var value = GetKeyColumn(val);
-                        if (typeof(TKey) == typeof(string))
-                        {
-                            return (TKey) (object) value.ToString();
-                        }
-
-                        return (TKey) value;
-                    }
-                )
-                .ToDictionary(x => x.Key, x => x.Last());
+            return ReadAsGroupedStringListList(Delimiter, XsvAsset, WithHeader);
         }
 
         /// <summary>
-        /// TValueの型で文字列をキーとして行を辞書型にして取り出し
-        /// Get Rows of Dictionary, Columns of TValue, style and String KeyType Mode
+        /// Get rows as a List of TValue
         /// </summary>
-        /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public static IDictionary<string, TValue> GetDictionary<TValue>(
-            XsvParser.Delimiter delimiter,
-            TextAsset xsvAsset,
-            bool headerEnable = true)
+        /// <typeparam name="TValue">Type of value</typeparam>
+        public IList<TValue> GetValueList<TValue>()
         {
-            return GetDictionary<string, TValue>(delimiter, xsvAsset, headerEnable);
+            return ReadAsValueList<TValue>(Delimiter, XsvAsset, WithHeader);
         }
 
         /// <summary>
-        /// TValueの型で行をリスト型にして取り出し
-        /// Get Rows of List style from TextAsset of TValue, Columns of TValue
+        /// Get rows as a List of List of string
         /// </summary>
-        /// <typeparam name="TValue">Columns(Struct or Class) Type</typeparam>
-        public static IEnumerable<TValue> GetList<TValue>(
-            XsvParser.Delimiter delimiter,
-            TextAsset xsvAsset,
-            bool headerEnable = true)
+        public IList<IList<string>> GetStringListList()
         {
-            return ReadXsv<TValue>(delimiter, xsvAsset, headerEnable).ToList();
+            return ReadAsStringListList(Delimiter, XsvAsset, WithHeader);
         }
 
         /// <summary>
-        /// 列をリスト型、行もリスト型にして、アセットから取り出し
-        /// Get Rows of List, Columns of List, style from TextAsset
+        /// Get rows as a Dictionary whose type is list of TValue
         /// </summary>
-        public static IEnumerable<IEnumerable<string>> GetList(
-            XsvParser.Delimiter delimiter,
-            TextAsset xsvAsset,
-            bool headerEnable = true)
+        /// <param name="delimiter">Delimiter (Comma|Tab)</param>
+        /// <param name="xsvAsset">TextAsset of xsv file</param>
+        /// <param name="withHeader">Use first line as header</param>
+        /// <typeparam name="TKey">Type of grouping key defined in TValue</typeparam>
+        /// <typeparam name="TValue">Type of value</typeparam>
+        public static IDictionary<TKey, IList<TValue>> ReadAsGroupedValueDictionary<TKey, TValue>(XsvParser.Delimiter delimiter, TextAsset xsvAsset, bool withHeader = true)
         {
-            var parse = XsvParser.Parse(delimiter, xsvAsset.text);
-            var list = parse.Select(x => x.ToList()).ToList();
-            if (headerEnable)
+            return ReadXsv<TValue>(delimiter, xsvAsset, withHeader)
+                ?.GroupBy(x => (TKey) GetKeyColumn(x))
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.ToList() as IList<TValue>
+                );
+        }
+
+        /// <summary>
+        /// Get rows as a List whose type is list of string Dictionary
+        /// </summary>
+        /// <param name="delimiter">Delimiter (Comma|Tab)</param>
+        /// <param name="xsvAsset">TextAsset of xsv file</param>
+        /// <param name="withHeader">Use first line as header</param>
+        public static IList<IList<IDictionary<string, string>>> ReadAsGroupedStringDictionaryList(XsvParser.Delimiter delimiter, TextAsset xsvAsset, bool withHeader = true)
+        {
+            if (withHeader)
             {
-                list.RemoveAt(0);
+                return XsvParser.ParseWithHeader(delimiter, xsvAsset.text)
+                    ?.GroupBy(x => x.Values.First())
+                    .Select(x => x.ToList() as IList<IDictionary<string, string>>)
+                    .ToList();
             }
 
-            return list;
+            return XsvParser.Parse(delimiter, xsvAsset.text)
+                ?.GroupBy(x => x.First())
+                .Select(
+                    x => x
+                        .Select(
+                            list => list
+                                .Select((item, index) => (item, index))
+                                .ToDictionary(y => y.index.ToString(), y => y.item) as IDictionary<string, string>
+                        )
+                        .ToList() as IList<IDictionary<string, string>>
+                )
+                .ToList();
         }
 
         /// <summary>
-        /// 列を辞書型、行をリスト型にして、アセットから取り出し
-        /// Get Rows of List, Columns of Dictionary, style from TextAsset
+        /// Get rows as a List whose type is list of string
         /// </summary>
-        public static IEnumerable<Dictionary<string, string>> GetListWithHeader(
-            XsvParser.Delimiter delimiter,
-            TextAsset xsvAsset)
+        /// <param name="delimiter">Delimiter (Comma|Tab)</param>
+        /// <param name="xsvAsset">TextAsset of xsv file</param>
+        /// <param name="withHeader">Use first line as header</param>
+        public static IList<IList<IList<string>>> ReadAsGroupedStringListList(XsvParser.Delimiter delimiter, TextAsset xsvAsset, bool withHeader = true)
         {
-            return XsvParser.ParseWithHeader(delimiter, xsvAsset.text)
-                .Select(x => x.ToDictionary(a => a.Key, a => a.Value)).ToList();
+            if (withHeader)
+            {
+                return XsvParser.ParseWithHeader(delimiter, xsvAsset.text)
+                    ?.GroupBy(x => x.Values.First())
+                    .Select(x => x.ToList().Select(y => y.Values.ToList() as IList<string>) as IList<IList<string>>)
+                    .ToList();
+            }
+
+            return XsvParser.Parse(delimiter, xsvAsset.text)
+                ?.GroupBy(x => x.First())
+                .Select(
+                    x => x
+                        .Select(
+                            list => list
+                                .ToList() as IList<string>
+                        )
+                        .ToList() as IList<IList<string>>
+                )
+                .ToList();
+        }
+
+        /// <summary>
+        /// Get rows as a Dictionary whose type is TValue
+        /// </summary>
+        /// <param name="delimiter">Delimiter (Comma|Tab)</param>
+        /// <param name="xsvAsset">TextAsset of xsv file</param>
+        /// <param name="withHeader">Use first line as header</param>
+        /// <param name="useFirst">Use first match if multiple hits</param>
+        /// <typeparam name="TKey">Type of grouping key defined in TValue</typeparam>
+        /// <typeparam name="TValue">Type of value</typeparam>
+        public static IDictionary<TKey, TValue> ReadAsValueDictionary<TKey, TValue>(XsvParser.Delimiter delimiter, TextAsset xsvAsset, bool withHeader = true, bool useFirst = true)
+        {
+            return ReadAsGroupedValueDictionary<TKey, TValue>(delimiter, xsvAsset, withHeader)
+                .ToDictionary(
+                    x => x.Key,
+                    x =>
+                        useFirst
+                            ? x.Value.First()
+                            : x.Value.Last()
+                );
+        }
+
+        /// <summary>
+        /// Get rows as a Dictionary whose type is TValue
+        /// </summary>
+        /// <param name="delimiter">Delimiter (Comma|Tab)</param>
+        /// <param name="xsvAsset">TextAsset of xsv file</param>
+        /// <param name="withHeader">Use first line as header</param>
+        /// <param name="useFirst">Use first match if multiple hits</param>
+        public static IList<IDictionary<string, string>> ReadAsStringDictionaryList(XsvParser.Delimiter delimiter, TextAsset xsvAsset, bool withHeader = true, bool useFirst = true)
+        {
+            return ReadAsGroupedStringDictionaryList(delimiter, xsvAsset, withHeader)
+                .Select(
+                    x =>
+                        useFirst
+                            ? x.First()
+                            : x.Last()
+                )
+                .ToList();
+        }
+
+        /// <summary>
+        /// Get rows as a List whose type is TValue
+        /// </summary>
+        /// <param name="delimiter">Delimiter (Comma|Tab)</param>
+        /// <param name="xsvAsset">TextAsset of xsv file</param>
+        /// <param name="withHeader">Use first line as header</param>
+        /// <typeparam name="TValue">Type of value</typeparam>
+        public static IList<TValue> ReadAsValueList<TValue>(XsvParser.Delimiter delimiter, TextAsset xsvAsset, bool withHeader = true)
+        {
+            return ReadXsv<TValue>(delimiter, xsvAsset, withHeader)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Get rows as a List whose type is string
+        /// </summary>
+        /// <param name="delimiter">Delimiter (Comma|Tab)</param>
+        /// <param name="xsvAsset">TextAsset of xsv file</param>
+        /// <param name="withHeader">Use first line as header</param>
+        public static IList<IList<string>> ReadAsStringListList(XsvParser.Delimiter delimiter, TextAsset xsvAsset, bool withHeader = true)
+        {
+            var data = XsvParser.Parse(delimiter, xsvAsset.text);
+            if (withHeader)
+            {
+                data.RemoveAt(0);
+            }
+
+            return data;
         }
 
         /// <summary>
@@ -229,7 +307,7 @@ namespace Monry.XsvUtility
         private static IEnumerable<TValue> ReadXsv<TValue>(
             XsvParser.Delimiter delimiter,
             TextAsset xsvAsset,
-            bool headerEnable = true)
+            bool withHeader = true)
         {
             if (xsvAsset == null)
             {
@@ -238,7 +316,7 @@ namespace Monry.XsvUtility
 
             return
                 (
-                    headerEnable
+                    withHeader
                         ? InternalSerializer.DeserializeWithHeader<Data<TValue>>(delimiter, xsvAsset.text)
                         : InternalSerializer.Deserialize<Data<TValue>>(delimiter, xsvAsset.text)
                 )

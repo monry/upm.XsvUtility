@@ -1,0 +1,100 @@
+root = true
+
+[*]
+indent_style = space
+
+# https://docs.microsoft.com/ja-jp/visualstudio/ide/editorconfig-code-style-settings-reference?view=vs-2017
+[*.cs]
+# インデント・文字コード
+indent_size = 4
+insert_final_newline = true
+charset = utf-8
+# this. 付けない
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_event = false:suggestion
+# Int32 ではなく int
+dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
+dotnet_style_predefined_type_for_member_access = true:suggestion
+# アクセシビリティ修飾子を付ける
+dotnet_style_require_accessibility_modifiers = always:suggestion
+dotnet_style_readonly_field = true:warning
+# アクセシビリティ修飾子などの並び順
+csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async:suggestion
+# 自明な括弧は取り除く
+dotnet_style_parentheses_in_arithmetic_binary_operators = never_if_unnecessary:none
+dotnet_style_parentheses_in_relational_binary_operators = never_if_unnecessary:none
+dotnet_style_parentheses_in_other_binary_operators = never_if_unnecessary:none
+dotnet_style_parentheses_in_other_operators = never_if_unnecessary:none
+# 削れる行は削る（三項演算子の利用や Auto Properties など）
+dotnet_style_object_initializer = true:suggestion
+dotnet_style_collection_initializer = true:suggestion
+dotnet_style_explicit_tuple_names = true:suggestion
+dotnet_style_prefer_inferred_tuple_names = true:suggestion
+dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
+dotnet_style_prefer_auto_properties = true:none
+dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
+dotnet_style_prefer_conditional_expression_over_return = true:suggestion
+# null 検査を利用する
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+# var による暗黙型を利用する
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = true:suggestion
+# Expression Bodied 構文を使う
+csharp_style_expression_bodied_methods = false:none
+csharp_style_expression_bodied_constructors = false:none
+csharp_style_expression_bodied_operators = false:none
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_indexers = true:suggestion
+csharp_style_expression_bodied_accessors = true:suggestion
+# パターンマッチ構文を用いる
+csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
+# インライン変数展開を用いる
+csharp_style_inlined_variable_declaration = true:suggestion
+# シンプルな default 構文を用いる
+csharp_prefer_simple_default_expression = true:suggestion
+# Tuple 代入時の変数展開を用いる
+csharp_style_deconstructed_variable_declaration = true:suggestion
+# 匿名関数の代わりにローカル関数を用いる
+csharp_style_pattern_local_over_anonymous_function = true:suggestion
+# null 検査演算子の後で throw 式を用いる
+csharp_style_throw_expression = true:suggestion
+# ラムダ式呼び出し時に条件付き合体演算子（?.）を用いる（Visual Studio は default: false だった）
+csharp_style_conditional_delegate_call = true:suggestion
+# コードブロックが1行でも中括弧を用いる
+csharp_prefer_braces = true:none
+# using のアルファベット順ソート
+dotnet_sort_system_directives_first = true
+# using の空行を許可しない
+dotnet_separate_import_directive_groups = false
+# 中括弧は新しい行に配置し、else, catch なども新しい行に配置
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+csharp_new_line_between_query_expression_clauses = true
+# switch, case をインデントする
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+csharp_indent_labels = no_change
+# スペース有無
+csharp_space_after_cast = true
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+csharp_space_between_method_call_parameter_list_parentheses = false
+csharp_space_between_parentheses = false
+csharp_space_before_colon_in_inheritance_clause = true
+csharp_space_after_colon_in_inheritance_clause = true
+csharp_space_around_binary_operators = before_and_after
+csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
+csharp_space_between_method_call_name_and_opening_parenthesis = false
+csharp_space_between_method_call_empty_parameter_list_parentheses = false
+# 折り返し設定
+csharp_preserve_single_line_statements = false # 1行での複数ステートメントを許可しない
+csharp_preserve_single_line_blocks = true # コードブロックの1行宣言を許可する

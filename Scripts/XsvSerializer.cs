@@ -295,6 +295,12 @@ namespace Monry.XsvUtility
 
         private static object ParseValue(Type type, string value)
         {
+            // Use Enum.Parse if type is enum
+            if (type.IsEnum)
+            {
+                // throw Exception if cannot parse string
+                return Enum.Parse(type, value, true);
+            }
             return ValueParseDelegateMap.ContainsKey(type) ? ValueParseDelegateMap[type](value) : default;
         }
     }
